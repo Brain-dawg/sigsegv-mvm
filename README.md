@@ -28,6 +28,22 @@ Download a package (optimize-only, no-mvm, or full) from releases and extract it
 
 # How to build
 
+## Easy Build
+Install docker and run `./configureandbuild.sh`.  This will set up the docker image, dependencies, build the full extension in release mode, and copy the extension to your server's tf directory.
+
+If you are building in WSL, you may need to edit your `/etc/resolv.conf` and set your nameserver to `8.8.8.8` or `1.1.1.1`
+
+## Usage:
+`./configureandbuild.sh [full_rebuild] [output_directory] [max_ambuild_jobs]`
+- `full_rebuild`: clear everything and build from scratch (slow).
+
+- `output_directory`: game server's tf directory to output the extension to.  Defaults to `/var/tf2server/tf`
+> [!WARNING]
+> This will overwrite your existing `cfg/sigsegv_convars...` files.  Back these up before running if you modified them.
+
+- `max_ambuild_jobs`: the maximum number of jobs to run in parallel.  Defaults to all CPU threads as reported by `nproc`.
+
+## Manual Build
 This extension requires gcc 13 to build
 
 Ubuntu 20.04 docker image with gcc 13 and other dependencies already installed (skip to step 3): rafradek/ubuntu2004dev:latest 
