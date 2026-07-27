@@ -6,7 +6,7 @@ DOCKER_IMAGE="rafradek/ubuntu2004dev:latest"
 REPO_DIR="${REPO_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}"
 BUILD_ROOT="${BUILD_ROOT:-$(cd "$REPO_DIR/.." && pwd)}"
 
-GAMESERVER_DIR="${GAMESERVER_DIR:-${2:-/var/tf2server/tf}}"
+GAMESERVER_DIR="${GAMESERVER_DIR:-${2:-"/var/tf2server/tf"}}"
 MAX_AMBUILD_JOBS="${MAX_AMBUILD_JOBS:-${3:-$(nproc 2>/dev/null || echo 4)}}"
 
 MODE="${MODE:-full}"
@@ -114,6 +114,7 @@ run_on_host()
     fi
 
     log "Build finished successfully."
+    deploy_to_gameserver
 }
 
 clone_alliedmodders()
@@ -200,10 +201,8 @@ build_lua()
 
 deploy_to_gameserver()
 {
-    if [ -d "${GAMESERVER_DIR}/addons/sourcemod" ]; then
-        log "Deploying package to ${GAMESERVER_DIR}/addons/sourcemod"
-        cp -rf "${REPO_DIR}/build/release/package/addons/sourcemod/"* "${GAMESERVER_DIR}/addons/sourcemod/"
-    fi
+    log "Deploying package to ${GAMESERVER_DIR}"
+    cp -rf "${REPO_DIR}/build/release/package/"* "${GAMESERVER_DIR}/"
 }
 
 run_in_container()
@@ -224,10 +223,10 @@ run_in_container()
 
     if [ "$MODE" = "release" ]; then
         log "Release build"
+        install_ambuild
         cd "${REPO_DIR}"
         ./autoconfig.sh
         ./multibuild.sh
-        deploy_to_gameserver
         return
     fi
 
@@ -249,7 +248,6 @@ run_in_container()
     cd "${REPO_DIR}"
     ./autoconfig.sh
     ./multibuild.sh
-    deploy_to_gameserver
 }
 
 if in_container; then
