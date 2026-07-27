@@ -38,7 +38,8 @@ If you are building in WSL, you may need to edit your `/etc/resolv.conf` and set
 - `full_rebuild`: clear everything and build from scratch (slow).
 
 - `output_directory`: game server's tf directory to output the extension to.  Defaults to `/var/tf2server/tf`
-[!WARNING] This will overwrite your existing `cfg/sigsegv_convars...` files.  Back these up before running if you modified them.
+> [!WARNING]
+> This will overwrite your existing `cfg/sigsegv_convars...` files.  Back these up before running if you modified them.
 
 - `max_ambuild_jobs`: the maximum number of jobs to run in parallel.  Defaults to all CPU threads as reported by `nproc`.
 
