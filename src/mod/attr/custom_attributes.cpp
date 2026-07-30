@@ -286,7 +286,8 @@ namespace Mod::Attr::Custom_Attributes
 			int can_heal = 0;
 			CALL_ATTRIB_HOOK_INT_ON_OTHER( medigun, can_heal, medic_machinery_beam );
 			auto object = ToBaseObject(healobject);
-			object->SetHealth( object->GetHealth() + ( (medigun->GetHealRate() / 10.f) * can_heal ) );
+			float newhealth = MIN( object->GetHealth() + ( (medigun->GetHealRate() / 10.f) * can_heal ),  object->GetMaxHealth() );
+			object->SetHealth( newhealth );
 			
 		}
 	}
