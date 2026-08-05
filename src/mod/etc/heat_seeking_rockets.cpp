@@ -341,7 +341,7 @@ namespace Mod::Etc::Heat_Seeking_Rockets
 						}
 					}
 				});
-				if (target_entity == nullptr && homing.allow_non_players == true) {
+				if (homing.allow_non_players == true) {
 					ForEachEntityByClassnameRTTI<CTFTankBoss>("tank_boss", [&](CTFTankBoss *tank) {
 						if (!tank->IsAlive()) 								return;
 						if (tank->GetTeamNumber() == proj->GetTeamNumber())	return;
