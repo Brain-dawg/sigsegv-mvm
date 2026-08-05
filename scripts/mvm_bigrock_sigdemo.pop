@@ -3845,3 +3845,6 @@ WaveSchedule
 // "player convar override 2" "tf_spy_invis_unstealth_time;2"
 // "player convar override 3" ""
 // "player convar override 4" ""
+
+// Allow projectile heat seeking to target tanks
+// "mod projectile heat target non players" 1
