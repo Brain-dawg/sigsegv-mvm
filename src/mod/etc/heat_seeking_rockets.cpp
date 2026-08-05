@@ -370,7 +370,7 @@ namespace Mod::Etc::Heat_Seeking_Rockets
 								target_dotproduct = dotproduct;
 							}
 						}
-					})
+					});
 				}
 				
 				if (target_entity != nullptr) {
