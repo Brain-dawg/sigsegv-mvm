@@ -8,6 +8,7 @@
 #include "stub/trace.h"
 #include "stub/objects.h"
 #include "util/misc.h"
+#include "stub/nextbot_cc.h"
 
 
 namespace Mod::Etc::Heat_Seeking_Rockets
@@ -299,7 +300,6 @@ namespace Mod::Etc::Heat_Seeking_Rockets
 				
 				float target_dotproduct  = FLT_MIN;
 				CBaseEntity *target_entity = nullptr;
-				// ForEachEntityByClassnameRTTI<CTFProjectile_GrapplingHook>("tf_projectile_grapplinghook", [](CTFProjectile_GrapplingHook *proj){ // example
 				ForEachTFPlayer([&](CTFPlayer *player){
 					if (!player->IsAlive())                               return;
 					if (player->GetTeamNumber() == TEAM_SPECTATOR)        return;
@@ -342,7 +342,8 @@ namespace Mod::Etc::Heat_Seeking_Rockets
 					}
 				});
 				if (target_entity == nullptr && homing.allow_non_players == true) {
-					ForEachEntityByClassnameRTTI<CTFBaseBoss>("tank_boss",[&](CTFBaseBoss *tank) {
+					// ForEachEntityByClassnameRTTI<CTFProjectile_GrapplingHook>("tf_projectile_grapplinghook", [](CTFProjectile_GrapplingHook *proj){ // example
+					ForEachEntityByClassnameRTTI<CTFTankBoss>("tank_boss", [](CTFTankBoss *tank) {
 						if (!tank->IsAlive()) 								return;
 						if (tank->GetTeamNumber() == proj->GetTeamNumber())	return;
 
@@ -355,8 +356,8 @@ namespace Mod::Etc::Heat_Seeking_Rockets
 						
 						
 
-					//	float distsqr = proj->WorldSpaceCenter().DistToSqr(tank->WorldSpaceCenter());
-					//	if (distsqr < target_distsqr) {
+						//	float distsqr = proj->WorldSpaceCenter().DistToSqr(tank->WorldSpaceCenter());
+						//	if (distsqr < target_distsqr) {
 						if (dotproduct > target_dotproduct) {
 							bool noclip = proj->GetMoveType() == MOVETYPE_NOCLIP;
 							trace_t tr;
