@@ -185,6 +185,11 @@ namespace Mod::Etc::Heat_Seeking_Rockets
 					CALL_ATTRIB_HOOK_INT_ON_OTHER(provider, follow_crosshair, mod_projectile_heat_no_predict_target_speed);
 					if (follow_crosshair != 0)
 						homing.predict_target_speed = false;
+
+					int target_non_players = 0;
+					CALL_ATTRIB_HOOK_INT_ON_OTHER(provider, target_non_players, mod_projectile_heat_target_non_players);
+					if (target_non_players != 0)
+						homing.allow_non_players = true;
 					
 					homing.speed = weapon != nullptr ? CalculateProjectileSpeed(weapon) : 1100;
 
@@ -293,7 +298,8 @@ namespace Mod::Etc::Heat_Seeking_Rockets
 			//	float target_distsqr     = FLT_MAX;
 				
 				float target_dotproduct  = FLT_MIN;
-				CTFPlayer *target_player = nullptr;
+				CBaseEntity *target_entity = nullptr;
+				// ForEachEntityByClassnameRTTI<CTFProjectile_GrapplingHook>("tf_projectile_grapplinghook", [](CTFProjectile_GrapplingHook *proj){ // example
 				ForEachTFPlayer([&](CTFPlayer *player){
 					if (!player->IsAlive())                               return;
 					if (player->GetTeamNumber() == TEAM_SPECTATOR)        return;
@@ -330,16 +336,47 @@ namespace Mod::Etc::Heat_Seeking_Rockets
 						}
 						
 						if (noclip || !tr.DidHit() || tr.m_pEnt == proj) {
-							target_player  = player;
+							target_entity  = player;
 							target_dotproduct = dotproduct;
 						}
 					}
 				});
-				if (target_player != nullptr) {
-					target_vec = target_player->WorldSpaceCenter();
-					float target_distance = proj->WorldSpaceCenter().DistTo(target_player->WorldSpaceCenter());
+				if (target_entity == nullptr && homing.allow_non_players == true) {
+					ForEachEntityByClassnameRTTI<CTFTankBoss>("tank_boss",[&](CTFTankBoss *tank) {
+						if (!tank->IsAlive()) 								return;
+						if (tank->GetTeamNumber() == proj->GetTeamNumber())	return;
+
+						Vector delta = tank->WorldSpaceCenter() - proj->WorldSpaceCenter();
+
+						float mindotproduct = homing.min_dot_product;
+						float dotproduct = DotProduct( delta.Normalized(), pNewVelocity->Normalized());
+						if (dotproduct < mindotproduct)
+							return;
+						
+						
+
+					//	float distsqr = proj->WorldSpaceCenter().DistToSqr(tank->WorldSpaceCenter());
+					//	if (distsqr < target_distsqr) {
+						if (dotproduct > target_dotproduct) {
+							bool noclip = proj->GetMoveType() == MOVETYPE_NOCLIP;
+							trace_t tr;
+							if (!noclip) {
+								UTIL_TraceLine( tank->WorldSpaceCenter(), proj->WorldSpaceCenter(), MASK_SOLID_BRUSHONLY, tank, COLLISION_GROUP_NONE, &tr);
+							}
+
+							if (noclip || !tr.DidHit() || tr.m_pEnt == proj) {
+								target_entity = tank;
+								target_dotproduct = dotproduct;
+							}
+						}
+					})
+				}
+				
+				if (target_entity != nullptr) {
+					target_vec = target_entity->WorldSpaceCenter();
+					float target_distance = proj->WorldSpaceCenter().DistTo(target_entity->WorldSpaceCenter());
 					if (homing.predict_target_speed)
-						target_vec += target_player->GetAbsVelocity() * target_distance / speed_calculated;
+						target_vec += target_entity->GetAbsVelocity() * target_distance / speed_calculated;
 				}
 			}
 			
