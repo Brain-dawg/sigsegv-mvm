@@ -161,6 +161,7 @@ public:
     bool ignore_stealthed_spies = true;
     bool follow_crosshair       = false;
     bool predict_target_speed   = true;
+    bool allow_non_players      = false;
     float speed                 = 1.0f;
     float turn_power            = 0.0f;
     float min_dot_product       = -0.25f;
