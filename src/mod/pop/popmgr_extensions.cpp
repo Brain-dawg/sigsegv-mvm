@@ -4231,7 +4231,7 @@ namespace Mod::Pop::PopMgr_Extensions
 				if (item.cost > 0 && !state.m_BoughtLoadoutItems[player->GetSteamID()].count(i)) {
 					snprintf(cost, sizeof(cost), "($%d)", item.cost);
 				}
-				ItemDrawInfo info1(FormatTextForPlayerSM(player, "%t: %s %s %t", loadoutStrings[item.loadout_slot], GetItemNameForDisplay(item.item, player), cost, selected ? "(selected)" : " "), ITEMDRAW_DEFAULT);
+				ItemDrawInfo info1(FormatTextForPlayerSM(player, "%t: %s %s %t", loadoutStrings[item.loadout_slot], GetItemNameForDisplay(item.item, player), cost, selected ? "(selected)" : ""), ITEMDRAW_DEFAULT);
 				std::string num = std::to_string(i);
 				menu->AppendItem(num.c_str(), info1);
 			}
