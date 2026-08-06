@@ -3521,7 +3521,7 @@ namespace Mod::Pop::PopMgr_Extensions
 			else {
 				auto &item = state.m_ExtraLoadoutItems[id];
 
-				if((cvar_show_free_descriptions.GetBool() && item.cost == 0) || item.cost > 0) {
+				if ((cvar_show_free_descriptions.GetBool() && item.cost == 0) || item.cost > 0) {
 					DisplayExtraLoadoutItemsBuy(player, id, autoHide, item.cost == 0);
 					return;
 				}
@@ -4277,10 +4277,9 @@ namespace Mod::Pop::PopMgr_Extensions
 		
 		CSteamID steamid;
 		player->GetSteamID(&steamid);
-
 		if (!state.m_BoughtLoadoutItems[steamid].count(itemId)) {
 			char buf[256];
-			if(free) {
+			if (free) {	// effectivly "buy" current weapon
 				state.m_BoughtLoadoutItems[steamid].insert(itemId);
 			}
 			else {
