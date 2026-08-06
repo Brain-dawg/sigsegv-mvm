@@ -122,6 +122,9 @@ namespace Mod::Pop::PopMgr_Extensions
 	ConVar sig_mvm_blu_players_sound_fixup("sig_mvm_blu_players_sound_fixup", "1", FCVAR_NOTIFY | FCVAR_GAMEDLL,
 		"Fixup blu players sounds so they use human sounds unless set otherwise. Set to 0 if it conflicts with other plugins");
 
+	ConVar cvar_show_free_descriptions("sig_mvm_show_free_descriptions", "0", FCVAR_NOTIFY | FCVAR_GAMEDLL, 
+		"Allow free weapons to display their descriptions, rather than instantly equiping");
+
 	void ResetVoteList() {
 		std::string poplistStr;
 		CUtlVector<CUtlString> vec;	
@@ -3260,7 +3263,7 @@ namespace Mod::Pop::PopMgr_Extensions
 
 	IBaseMenu *DisplayExtraLoadoutItemsClass(CTFPlayer *player, int class_index, bool autoHide);
 	IBaseMenu *DisplayExtraLoadoutItems(CTFPlayer *player, bool autoHide);
-	IBaseMenu *DisplayExtraLoadoutItemsBuy(CTFPlayer *player, int itemId, bool autoHide);
+	IBaseMenu *DisplayExtraLoadoutItemsBuy(CTFPlayer *player, int itemId, bool autoHide, bool free);
 
 	class SelectMainMissionInfoHandler : public IMenuHandler
     {
@@ -3518,8 +3521,8 @@ namespace Mod::Pop::PopMgr_Extensions
 			else {
 				auto &item = state.m_ExtraLoadoutItems[id];
 
-				if (item.cost > 0) {
-					DisplayExtraLoadoutItemsBuy(player, id, autoHide);
+				if((cvar_show_free_descriptions.GetBool() && item.cost == 0) || item.cost > 0) {
+					DisplayExtraLoadoutItemsBuy(player, id, autoHide, item.cost == 0);
 					return;
 				}
 
@@ -4228,7 +4231,7 @@ namespace Mod::Pop::PopMgr_Extensions
 				if (item.cost > 0 && !state.m_BoughtLoadoutItems[player->GetSteamID()].count(i)) {
 					snprintf(cost, sizeof(cost), "($%d)", item.cost);
 				}
-				ItemDrawInfo info1(FormatTextForPlayerSM(player, "%t: %s %s %t", loadoutStrings[item.loadout_slot], GetItemNameForDisplay(item.item, player), cost, selected ? "(selected)" : ""), ITEMDRAW_DEFAULT);
+				ItemDrawInfo info1(FormatTextForPlayerSM(player, "%t: %s %s %t", loadoutStrings[item.loadout_slot], GetItemNameForDisplay(item.item, player), cost, selected ? "(selected)" : " "), ITEMDRAW_DEFAULT);
 				std::string num = std::to_string(i);
 				menu->AppendItem(num.c_str(), info1);
 			}
@@ -4251,7 +4254,7 @@ namespace Mod::Pop::PopMgr_Extensions
 		return menu;
 	}
 
-	IBaseMenu *DisplayExtraLoadoutItemsBuy(CTFPlayer *player, int itemId, bool autoHide)
+	IBaseMenu *DisplayExtraLoadoutItemsBuy(CTFPlayer *player, int itemId, bool autoHide, bool free)
 	{
 		SelectExtraLoadoutItemsBuyHandler *handler = new SelectExtraLoadoutItemsBuyHandler(player, itemId, autoHide);
         IBaseMenu *menu = menus->GetDefaultStyle()->CreateMenu(handler, g_Ext.GetIdentity());
@@ -4274,11 +4277,17 @@ namespace Mod::Pop::PopMgr_Extensions
 		
 		CSteamID steamid;
 		player->GetSteamID(&steamid);
+
 		if (!state.m_BoughtLoadoutItems[steamid].count(itemId)) {
 			char buf[256];
-			snprintf(buf, sizeof(buf), "%s ($%d)", TranslateText(player, "Buy"), item.cost);
-			ItemDrawInfo info1(buf, player->GetCurrency() >= item.cost ? ITEMDRAW_DEFAULT : ITEMDRAW_DISABLED);
-			menu->AppendItem("Buy", info1);
+			if(free) {
+				state.m_BoughtLoadoutItems[steamid].insert(itemId);
+			}
+			else {
+				snprintf(buf, sizeof(buf), "%s ($%d)", TranslateText(player, "Buy"), item.cost);
+				ItemDrawInfo info1(buf, player->GetCurrency() >= item.cost ? ITEMDRAW_DEFAULT : ITEMDRAW_DISABLED);
+				menu->AppendItem("Buy", info1);
+			}
 		}
 
 		if (state.m_BoughtLoadoutItems[steamid].count(itemId)) {
@@ -4291,7 +4300,7 @@ namespace Mod::Pop::PopMgr_Extensions
 				menu->AppendItem("Equip", info1);
 			}
 
-			if (item.allow_refund) {
+			if (item.allow_refund && !free) {
 				char buf[256];
 				snprintf(buf, sizeof(buf), "%s ($%d)", TranslateText(player, "Sell"), item.cost);
 				ItemDrawInfo info2(TranslateText(player, "Sell"), ITEMDRAW_DEFAULT);
