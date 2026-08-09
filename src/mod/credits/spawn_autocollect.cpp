@@ -3,6 +3,7 @@
 #include "stub/nav.h"
 #include "stub/tfentities.h"
 #include "stub/gamerules.h"
+#include "stub/entities.h"
 
 namespace Mod::Credits::Spawn_AutoCollect
 {
@@ -26,11 +27,23 @@ namespace Mod::Credits::Spawn_AutoCollect
 			return;
 
 		if (TheNavMesh->GetNavArea(pack->GetAbsOrigin()) == NULL ||
-			IsTakingTriggerHurtDamageAtPoint(pack->GetAbsOrigin()) ||
 			PointInRespawnRoom(NULL, pack->GetAbsOrigin(), false))
 		{
 			AutoCollect(pack);
 			return;
+		}
+
+		for (auto elem : ITriggerHurtAutoList::AutoList())
+		{
+			auto trigger = rtti_scast<CTriggerHurt *>(elem);
+			if (trigger == nullptr)
+				continue;
+
+			if (!trigger->m_bDisabled && trigger->PointIsWithin(pack->GetAbsOrigin()))
+			{
+				AutoCollect(pack);
+				return;
+			}
 		}
 	}
 

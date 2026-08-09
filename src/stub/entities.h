@@ -66,11 +66,13 @@ class CBaseTrigger : public CBaseToggle
 {
 public:
 	bool PassesTriggerFilters(CBaseEntity *entity) { return vt_PassesTriggerFilters(this, entity); }
+	bool PointIsWithin(const Vector& vecPoint) { return ft_PointIsWithin(this, vecPoint); }
 
 	DECL_DATAMAP(bool, m_bDisabled);
 
 private:
 	static MemberVFuncThunk<CBaseTrigger *, bool, CBaseEntity *> vt_PassesTriggerFilters;
+	static MemberFuncThunk<CBaseTrigger *, bool, const Vector&> ft_PointIsWithin;
 };
 
 class CFuncNavPrerequisite : public CBaseTrigger
@@ -190,6 +192,16 @@ public:
 private:
 	static MemberFuncThunk<CTriggerCamera *, void> ft_Enable;
 	static MemberFuncThunk<CTriggerCamera *, void> ft_Disable;
+};
+
+class CTriggerHurt : public CBaseTrigger {};
+
+class ITriggerHurtAutoList
+{
+public:
+	static const CUtlVector<ITriggerHurtAutoList *>& AutoList() { return m_ITriggerHurtAutoListAutoList; }
+private:
+	static GlobalThunk<CUtlVector<ITriggerHurtAutoList *>> m_ITriggerHurtAutoListAutoList;
 };
 
 bool IsTakingTriggerHurtDamageAtPoint(const Vector& vec);

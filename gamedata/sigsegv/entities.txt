@@ -654,6 +654,7 @@
 				"CBaseFilter::PassesDamageFilter" "_ZN11CBaseFilter18PassesDamageFilterERK15CTakeDamageInfo"
 				"CBaseFilter::PassesDamageFilterImpl" "_ZN11CBaseFilter22PassesDamageFilterImplERK15CTakeDamageInfo"
 				"CBaseFilter::PassesFilter" "_ZN11CBaseFilter12PassesFilterEP11CBaseEntityS1_"
+				"CBaseTrigger::PointIsWithin" "_ZN12CBaseTrigger13PointIsWithinERK6Vector"
 				"CBaseFilter::PassesFilterImpl" "_ZN11CBaseFilter16PassesFilterImplEP11CBaseEntityS1_"
 				"CBaseFlex::AddSceneEvent" "_ZN9CBaseFlex13AddSceneEventEP12CChoreoSceneP12CChoreoEventP11CBaseEntity"
 				"CBaseFlex::ProcessSceneEvents" "_ZN9CBaseFlex18ProcessSceneEventsEv"
@@ -1099,6 +1100,7 @@
 				"CWeaponMedigun::RemoveHealingTarget" "_ZN14CWeaponMedigun19RemoveHealingTargetEb"
 				"CWeaponMedigun::StartHealingTarget" "_ZN14CWeaponMedigun18StartHealingTargetEP11CBaseEntity"
 
+				"ITriggerHurtAutoList::m_ITriggerHurtAutoListAutoList" "_ZN20ITriggerHurtAutoList30m_ITriggerHurtAutoListAutoListE"
 				"IBaseObjectAutoList::m_IBaseObjectAutoListAutoList" "_ZN19IBaseObjectAutoList29m_IBaseObjectAutoListAutoListE"
 				"IBaseProjectileAutoList::m_IBaseProjectileAutoListAutoList" "_ZN23IBaseProjectileAutoList33m_IBaseProjectileAutoListAutoListE"
 				"ICaptureFlagAutoList::m_ICaptureFlagAutoListAutoList" "_ZN20ICaptureFlagAutoList30m_ICaptureFlagAutoListAutoListE"
