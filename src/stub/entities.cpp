@@ -80,8 +80,12 @@ IMPL_DATAMAP (CHandle<CBasePlayer>, CGameUI, m_player);
 IMPL_DATAMAP (CHandle<CBaseEntity>, CTriggerCamera, m_hPlayer);
 IMPL_DATAMAP (CHandle<CBaseEntity>, CTriggerCamera, m_hTarget);
 
+MemberFuncThunk<CBaseTrigger *, bool, const Vector&> CBaseTrigger::ft_PointIsWithin("CBaseTrigger::PointIsWithin");
+
 MemberFuncThunk<CTriggerCamera *, void> CTriggerCamera::ft_Enable("CTriggerCamera::Enable");
 MemberFuncThunk<CTriggerCamera *, void> CTriggerCamera::ft_Disable("CTriggerCamera::Disable");
+
+GlobalThunk<CUtlVector<ITriggerHurtAutoList *>> ITriggerHurtAutoList::m_ITriggerHurtAutoListAutoList("ITriggerHurtAutoList::m_ITriggerHurtAutoListAutoList");
 
 static StaticFuncThunk<bool, const Vector&> ft_IsTakingTriggerHurtDamageAtPoint("IsTakingTriggerHurtDamageAtPoint");
 bool IsTakingTriggerHurtDamageAtPoint(const Vector& vec) { return ft_IsTakingTriggerHurtDamageAtPoint(vec); }
