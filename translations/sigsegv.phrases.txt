@@ -512,6 +512,11 @@
 		"pl"		"(wybrane)"
 	}
 
+	"(unselected)"
+	{
+		"en"		""
+	}
+
 	"Forced items class"
 	{
 		"#format"	"{1:s}"
