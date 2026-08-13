@@ -3516,7 +3516,7 @@ namespace Mod::Pop::PopMgr_Extensions
 	// im making a client-side command that will let you skip the menu when using a command
 	bool ShouldMenuWeaponBuyShow(CTFPlayer *player, int cost) {
 		if (cost > 0) {
-			return true
+			return true;
 		}
 		// cost will be 0 at this point
 
@@ -3525,7 +3525,7 @@ namespace Mod::Pop::PopMgr_Extensions
 			// value == 0, show menu, else dont
 		}
 		else {
-			return false
+			return false;
 		}
 	}
 
