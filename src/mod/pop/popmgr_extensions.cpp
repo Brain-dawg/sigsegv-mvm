@@ -3550,7 +3550,8 @@ namespace Mod::Pop::PopMgr_Extensions
 			else {
 				auto &item = state.m_ExtraLoadoutItems[id];
 
-				if ((cvar_show_free_descriptions.GetBool() && item.cost == 0) || item.cost > 0) {
+				// if ((cvar_show_free_descriptions.GetBool() && item.cost == 0) || item.cost > 0) {
+				if (ShouldMenuWeaponBuyShow(player, item.cost)) {
 					DisplayExtraLoadoutItemsBuy(player, id, autoHide, item.cost == 0);
 					return;
 				}
