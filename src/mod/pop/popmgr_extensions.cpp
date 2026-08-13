@@ -123,7 +123,7 @@ namespace Mod::Pop::PopMgr_Extensions
 		"Fixup blu players sounds so they use human sounds unless set otherwise. Set to 0 if it conflicts with other plugins");
 
 	ConVar cvar_show_free_descriptions("sig_mvm_show_free_descriptions", "0", FCVAR_NOTIFY | FCVAR_GAMEDLL, 
-		"Allow free weapons to display their descriptions, rather than instantly equiping");
+		"Allow free weapons to display their descriptions, rather than instantly equiping, can be toggled client-side with the `sig_free_menu_disable` and `sig_free_menu_enabled` commands");
 
 	void ResetVoteList() {
 		std::string poplistStr;
@@ -3499,6 +3499,35 @@ namespace Mod::Pop::PopMgr_Extensions
 
 		CHandle<CTFPlayer> player;
     };
+
+	// if the player wants to instantly equip items in the menu
+	bool player_skip_free_menu[MAX_PLAYERS + 1] = {};
+
+	ModCommandClient sig_free_menu_disable("sig_free_menu_disable", [](CCommandPlayer *player, const CCommand& args){
+        player_skip_free_menu[ENTINDEX(player)] = 1;
+		ModCommandResponse("%s\n", TranslateText(player, "Free weapons will no longer show a menu"));
+    });
+
+    ModCommandClient sig_free_menu_enable("sig_free_menu_enable", [](CCommandPlayer *player, const CCommand& args){
+        player_skip_free_menu[ENTINDEX(player)] = 0;
+		ModCommandResponse("%s\n", TranslateText(player, "Free weapons will now show a equip menu"));
+    });
+
+	// im making a client-side command that will let you skip the menu when using a command
+	bool ShouldMenuWeaponBuyShow(CTFPlayer *player, int cost) {
+		if (cost > 0) {
+			return true
+		}
+		// cost will be 0 at this point
+
+		if (cvar_show_free_descriptions.GetBool()) {
+			return player_skip_free_menu[ENTINDEX(player)] == 0;
+			// value == 0, show menu, else dont
+		}
+		else {
+			return false
+		}
+	}
 
 	class SelectExtraLoadoutItemsHandler : public ExtraLoadoutItemsHander
     {
