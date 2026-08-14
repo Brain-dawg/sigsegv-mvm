@@ -3513,7 +3513,6 @@ namespace Mod::Pop::PopMgr_Extensions
 		ModCommandResponse("%s\n", TranslateText(player, "Free weapons will now show a equip menu"));
     });
 
-	// im making a client-side command that will let you skip the menu when using a command
 	bool ShouldMenuWeaponBuyShow(CTFPlayer *player, int cost) {
 		if (cost > 0) {
 			return true;
@@ -3550,6 +3549,7 @@ namespace Mod::Pop::PopMgr_Extensions
 			else {
 				auto &item = state.m_ExtraLoadoutItems[id];
 
+				// old behavior
 				// if ((cvar_show_free_descriptions.GetBool() && item.cost == 0) || item.cost > 0) {
 				if (ShouldMenuWeaponBuyShow(player, item.cost)) {
 					DisplayExtraLoadoutItemsBuy(player, id, autoHide, item.cost == 0);
