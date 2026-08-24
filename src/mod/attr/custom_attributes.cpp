@@ -7181,6 +7181,8 @@ namespace Mod::Attr::Custom_Attributes
 			}
 		}
 		if (weapon == nullptr) return nullptr;
+		// fix weapons (syringe gun) hitting itself with its own projectiles
+		weapon->SetSolid(SOLID_NONE);
 			
 		// Fire the weapon
 
