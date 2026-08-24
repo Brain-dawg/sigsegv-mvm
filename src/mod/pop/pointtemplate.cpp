@@ -29,7 +29,7 @@ class TemplateEntityModule : public EntityModule
 public:
 	TemplateEntityModule() {}
 	TemplateEntityModule(CBaseEntity *entity) : entity(entity) {}
-	
+
 	CBaseEntity *entity = nullptr;
 	bool deleteAllOnRemove = false;
 
@@ -41,7 +41,7 @@ class WholeMapTriggerModule : public EntityModule, public AutoList<WholeMapTrigg
 public:
 	WholeMapTriggerModule() {}
 	WholeMapTriggerModule(CBaseEntity *entity) : entity(entity) {}
-	
+
 	CBaseEntity *entity = nullptr;
 	std::unordered_map<std::string, std::pair<variant_t, variant_t>> props;
 };
@@ -53,7 +53,7 @@ void FixupKeyvalue(std::string &val,int id, const char *parentname, FixupNames &
 		if (endNamePos != std::string::npos) {
 			std::string entName = val.substr(amperpos+1, endNamePos - amperpos - 1);
 
-			// Find if there is already an entity with that name, if yes, fix up the name, otherwise delete the fixup marker 
+			// Find if there is already an entity with that name, if yes, fix up the name, otherwise delete the fixup marker
 			// bool found = false;
 			// for (CBaseEntity* entity = nullptr; (entity = servertools->FindEntityByName(entity, entName.c_str())) != nullptr ; ) {
 			// 	if (std::find(matching.begin(), matching.end(), entity) == matching.end()) {
@@ -74,7 +74,7 @@ void FixupKeyvalue(std::string &val,int id, const char *parentname, FixupNames &
 			amperpos++;
 		}
 	}
-		
+
 	size_t parpos = 0;
 	while((parpos = val.find("!parent",parpos)) != std::string::npos){
 		val.replace(parpos,7,parentname);
@@ -133,28 +133,29 @@ void SpawnEntity(CBaseEntity *entity) {
 }
 
 
-struct BrushEntityBoundingBox 
+struct BrushEntityBoundingBox
 {
-	BrushEntityBoundingBox(CBaseEntity *entity, std::string &min, std::string &max) : entity(entity), min(min), max(max) {}
+	BrushEntityBoundingBox(CBaseEntity *entity, const std::string &min, const std::string &max, const SolidType_t solid)
+		: entity(entity), min(min), max(max), solid(solid) {}
 
 	CBaseEntity *entity;
-	std::string &min;
-	std::string &max;
+	std::string min;
+	std::string max;
+	SolidType_t solid;
 };
 
-	
+
 bool TriggerCollideable(CBaseEntity *entity)
 {
 	return entity->GetSolid() != SOLID_NONE && !entity->CollisionProp()->IsSolidFlagSet(FSOLID_TRIGGER) && !entity->CollisionProp()->IsSolidFlagSet(FSOLID_NOT_SOLID);
 }
 
-std::shared_ptr<PointTemplateInstance> PointTemplate::SpawnTemplate(CBaseEntity *parent, const Vector &translation, const QAngle &rotation, bool autoparent, const char *attachment, bool ignore_parent_alive_state, const TemplateParams &params) {
-
+std::shared_ptr<PointTemplateInstance> PointTemplate::SpawnTemplate(CBaseEntity *parent, const Vector &translation, const QAngle &rotation, bool autoparent, const char *attachment, bool ignore_parent_alive_state, const TemplateParams &params)
+{
 	Template_Increment +=1;
 	if (Template_Increment > 999999)
 		Template_Increment = 0;
 
-	
 	auto templ_inst = std::make_shared<PointTemplateInstance>();
 	g_templateInstances.push_back(templ_inst);
 	templ_inst->templ = this;
@@ -167,17 +168,19 @@ std::shared_ptr<PointTemplateInstance> PointTemplate::SpawnTemplate(CBaseEntity 
 	std::string parentname;
 	CBaseEntity* parent_helper = parent;
 
-	if (parent != nullptr){
-
+	if (parent != nullptr)
+	{
 		int bone = -1;
-		if (attachment != nullptr) {
+		if (attachment != nullptr)
+		{
 			CBaseAnimating *animating = rtti_cast<CBaseAnimating *>(parent);
 			if (animating != nullptr)
 				bone = animating->LookupBone(attachment);
 		}
 		templ_inst->attachment = bone;
 
- 		if(parent->IsPlayer() && autoparent && !this->entities.empty()){
+		if(parent->IsPlayer() && autoparent && !this->entities.empty())
+		{
 			parent_helper = CreateEntityByName("point_teleport");
 			parent_helper->SetAbsOrigin(parent->GetAbsOrigin());
 			parent_helper->SetAbsAngles(parent->GetAbsAngles());
@@ -194,8 +197,8 @@ std::shared_ptr<PointTemplateInstance> PointTemplate::SpawnTemplate(CBaseEntity 
 	{
 		parentname = "";
 	}
-	
-	std::unordered_map<std::string,CBaseEntity*> spawned;
+
+	std::unordered_map<std::string, CBaseEntity*> spawned;
 	std::vector<std::pair<CBaseEntity*, string_t>> parent_string_restore;
 
 	HierarchicalSpawn_t *list_spawned = new HierarchicalSpawn_t[this->entities.size()];
@@ -204,53 +207,58 @@ std::shared_ptr<PointTemplateInstance> PointTemplate::SpawnTemplate(CBaseEntity 
 
 	std::vector<BrushEntityBoundingBox> brush_entity_bounding_box;
 
-	for (auto it = this->entities.begin(); it != this->entities.end(); ++it){
+	for (auto it = this->entities.begin(); it != this->entities.end(); ++it)
+	{
 		auto &keys = *it;
 		CBaseEntity *entity = CreateEntityByName(keys.find("classname")->second.c_str());
-		if (entity != nullptr) {
+		if (entity != nullptr)
+		{
 			templ_inst->entities.push_back(entity);
 			auto mod = entity->GetOrCreateEntityModule<TemplateEntityModule>("templatemodule");
 			mod->inst = templ_inst;
-			for (auto it1 = keys.begin(); it1 != keys.end(); ++it1){
+			for (auto it1 = keys.begin(); it1 != keys.end(); ++it1)
+			{
 				std::string val = it1->second;
 
 				if (!this->no_fixup)
-					FixupKeyvalue(val,Template_Increment,parentname.c_str(), g_fixupNames);
-					
+					FixupKeyvalue(val, Template_Increment, parentname.c_str(), g_fixupNames);
+
 				FixupParameters(val, params);
 
 				servertools->SetKeyValue(entity, it1->first.c_str(), val.c_str());
 			}
 
 			auto itname = keys.find("targetname");
-			if (itname != keys.end()){
-				if (this->remove_if_killed != "" && itname->second == this->remove_if_killed) {
+			if (itname != keys.end())
+			{
+				if (this->remove_if_killed != "" && itname->second == this->remove_if_killed)
 					mod->deleteAllOnRemove = true;
-				}
-				spawned[itname->second]=entity;
+				spawned[itname->second] = entity;
 			}
-			
+
 			Vector translated = vec3_origin;
 			QAngle rotated = vec3_angle;
-			VectorAdd(entity->GetAbsOrigin(),translation,translated);
-			VectorAdd(entity->GetAbsAngles(),rotation,rotated);
-			if (parent != nullptr && autoparent) {
-						
-				VMatrix matEntityToWorld,matNewTemplateToWorld, matStoredLocalToWorld;
-				matEntityToWorld.SetupMatrixOrgAngles( translated, rotated );
-				matNewTemplateToWorld.SetupMatrixOrgAngles( parent->GetAbsOrigin(), parent->GetAbsAngles() );
-				MatrixMultiply( matNewTemplateToWorld, matEntityToWorld, matStoredLocalToWorld );
+			VectorAdd(entity->GetAbsOrigin(), translation, translated);
+			VectorAdd(entity->GetAbsAngles(), rotation, rotated);
+
+			if (parent != nullptr && autoparent)
+			{
+				VMatrix matEntityToWorld, matNewTemplateToWorld, matStoredLocalToWorld;
+				matEntityToWorld.SetupMatrixOrgAngles(translated, rotated);
+				matNewTemplateToWorld.SetupMatrixOrgAngles(parent->GetAbsOrigin(), parent->GetAbsAngles());
+				MatrixMultiply(matNewTemplateToWorld, matEntityToWorld, matStoredLocalToWorld);
 
 				Vector origin;
 				QAngle angles;
 				origin = matStoredLocalToWorld.GetTranslation();
-				MatrixToAngles( matStoredLocalToWorld, angles );
+				MatrixToAngles(matStoredLocalToWorld, angles);
 				entity->SetAbsOrigin(origin);
 				entity->SetAbsAngles(angles);
 
-				if (keys.find("parentname") == keys.end()){
+				if (keys.find("parentname") == keys.end())
+				{
 					entity->SetParent(parent_helper, -1);
-					
+
 					// Set string to NULL to prevent SpawnHierarchicalList from messing up parenting with the spawntemplate parent
 					parent_string_restore.push_back({entity, entity->m_iParent});
 					entity->m_iParent = NULL_STRING;
@@ -258,77 +266,93 @@ std::shared_ptr<PointTemplateInstance> PointTemplate::SpawnTemplate(CBaseEntity 
 			}
 			else
 			{
-				entity->Teleport(&translated,&rotated,&vec3_origin);
+				entity->Teleport(&translated, &rotated, &vec3_origin);
 			}
 
-			/*if (keys.find("parentname") != keys.end()) {
-				std::string parstr = keys.find("parentname")->second;
-				CBaseEntity *parentlocal = spawned[parstr];
-				if (parentlocal != nullptr) {
-					entity->SetParent(parentlocal, -1);
-				}
-			}*/
-			
 			list_spawned[num_entity].m_hEntity = entity;
 			list_spawned[num_entity].m_nDepth = 0;
 			list_spawned[num_entity].m_pDeferredParentAttachment = NULL;
 			list_spawned[num_entity].m_pDeferredParent = NULL;
-			
-			//To make brush entities working
-			if (keys.find("mins") != keys.end() && keys.find("maxs") != keys.end()){
-				brush_entity_bounding_box.push_back({entity, keys.find("mins")->second, keys.find("maxs")->second});
+
+			bool has_dimensions = false;
+			std::string mins = "0 0 0";
+			std::string maxs = "0 0 0";
+
+			if (keys.find("mins") != keys.end())
+			{
+				mins = keys.find("mins")->second;
+				has_dimensions = true;
 			}
+			if (keys.find("maxs") != keys.end())
+			{
+				maxs = keys.find("maxs")->second;
+				has_dimensions = true;
+			}
+
+			if (has_dimensions)
+			{
+				SolidType_t solid = SOLID_BBOX;
+
+				auto solid_key = keys.find("solid");
+				if (solid_key != keys.end())
+					solid = static_cast<SolidType_t>(std::stoi(solid_key->second));
+
+				brush_entity_bounding_box.push_back({entity, mins, maxs, solid});
+			}
+
 			num_entity++;
 		}
-		
 	}
-	
+
 	SpawnHierarchicalList(num_entity, list_spawned, true);
 
-	for (auto &box : brush_entity_bounding_box) {
+	// Setting up bounding boxes must be done after spawn (as DispatchSpawn resets them).
+	for (auto &box : brush_entity_bounding_box)
+	{
 		box.entity->SetModel(TEMPLATE_BRUSH_MODEL);
-		box.entity->SetSolid(SOLID_BBOX);
+		box.entity->SetSolid(box.solid);
+
 		Vector strMin, strMax;
 		UTIL_StringToVector(strMin.Base(), box.min.c_str());
 		UTIL_StringToVector(strMax.Base(), box.max.c_str());
 		Vector min(Min(strMin.x, strMax.x), Min(strMin.y, strMax.y), Min(strMin.z, strMax.z));
 		Vector max(Max(strMin.x, strMax.x), Max(strMin.y, strMax.y), Max(strMin.z, strMax.z));
-		//sscanf(box.min.c_str(), "%f %f %f", &min.x, &min.y, &min.z);
-		//sscanf(box.max.c_str(), "%f %f %f", &max.x, &max.y, &max.z);
-		if (fast_whole_map_trigger.GetBool() && ((max.z - min.z) * (max.y - min.y) * (max.x - min.x)) > 4500.0f * 4500.0f * 4500.0f  && box.entity->CollisionProp()->IsSolidFlagSet(FSOLID_TRIGGER)) {
+
+		if (fast_whole_map_trigger.GetBool() && ((max.z - min.z) * (max.y - min.y) * (max.x - min.x)) > std::pow(4500.f, 3) && box.entity->CollisionProp()->IsSolidFlagSet(FSOLID_TRIGGER))
+		{
 			min = vec3_origin;
 			max = vec3_origin;
-			box.entity->SetAbsOrigin(Vector(-30000,-30000,-30000));
+			box.entity->SetAbsOrigin(Vector(-30000.f, -30000.f, -30000.f));
 			box.entity->GetOrCreateEntityModule<WholeMapTriggerModule>("wholemaptrigger");
-			ForEachEntity([&](CBaseEntity *entity) {
-				if (TriggerCollideable(entity)) {
+			ForEachEntity([&](CBaseEntity *entity)
+			{
+				if (TriggerCollideable(entity))
 					box.entity->StartTouch(entity);
-				}
 			});
 		}
+
 		box.entity->CollisionProp()->SetCollisionBounds(min, max);
-		box.entity->AddEffects(32); //DONT RENDER
-		box.entity->SetRenderMode(kRenderNone); //DONT RENDER
-		if (box.entity->GetMoveParent() != nullptr) {
+
+		box.entity->AddEffects(EF_NODRAW);
+		box.entity->SetRenderMode(kRenderNone);
+
+		if (box.entity->GetMoveParent() != nullptr)
 			box.entity->CollisionProp()->AddSolidFlags(FSOLID_ROOT_PARENT_ALIGNED);
-		}
 	}
 
 	// Restore parenting string
-	for (auto &pair : parent_string_restore) {
+	for (auto &pair : parent_string_restore)
 		pair.first->m_iParent = pair.second;
-	}
 
 	FixupTriggers(this->on_spawn_triggers, templ_inst.get(), templ_inst->on_spawn_triggers_fixed, g_fixupNames);
 	FixupTriggers(this->on_parent_kill_triggers, templ_inst.get(), templ_inst->on_parent_kill_triggers_fixed, g_fixupNames);
 	FixupTriggers(this->on_kill_triggers, templ_inst.get(), templ_inst->on_kill_triggers_fixed, g_fixupNames);
-	if (!templ_inst->on_spawn_triggers_fixed.empty()) {
-		TriggerList(parent != nullptr ? parent : UTIL_EntityByIndex(0), templ_inst->on_spawn_triggers_fixed);
-	}
 
-	for (auto &str : this->fixup_names) {
+	if (!templ_inst->on_spawn_triggers_fixed.empty())
+		TriggerList(parent != nullptr ? parent : UTIL_EntityByIndex(0), templ_inst->on_spawn_triggers_fixed);
+
+	for (auto &str : this->fixup_names)
 		g_fixupNames.insert(str);
-	}
 
 	delete[] list_spawned;
 
@@ -336,8 +360,8 @@ std::shared_ptr<PointTemplateInstance> PointTemplate::SpawnTemplate(CBaseEntity 
 }
 
 /// @brief Spawns template specified by the object
-/// @param parent 
-/// @param autoparent 
+/// @param parent
+/// @param autoparent
 /// @return The shared pointer to template instance, returns null pointer if template is invalid
 std::shared_ptr<PointTemplateInstance> PointTemplateInfo::SpawnTemplate(CBaseEntity *parent, bool autoparent){
 	if (templ == nullptr && template_name.size() > 0)
@@ -360,7 +384,7 @@ bool ShootTemplateData::Shoot(CTFPlayer *player, CTFWeaponBase *weapon) {
 		vecOffset.z = 8.0f;
 	}
 	weapon->GetProjectileFireSetup( player, vecOffset, &vecSrc, &angForward, false ,2000);
-	
+
 	angForward += this->angles;
 
 	auto inst = this->templ->SpawnTemplate(player, vecSrc, angForward, false, nullptr, false, parameters);
@@ -393,7 +417,7 @@ bool ShootTemplateData::Shoot(CTFPlayer *player, CTFWeaponBase *weapon) {
 PointTemplateInfo Parse_SpawnTemplate(KeyValues *kv) {
 	PointTemplateInfo info;
 	bool hasname = false;
-	
+
 	FOR_EACH_SUBKEY(kv, subkey) {
 		hasname = true;
 		const char *name = subkey->GetName();
@@ -502,7 +526,7 @@ void PointTemplateInstance::OnKilledParent(bool cleared) {
 	for(auto it = this->entities.begin(); it != this->entities.end(); it++){
 		if (*(it) != nullptr){
 			if (cleared || !(this->templ->keep_alive)){
-				
+
 				servertools->RemoveEntity(*(it));
 			}
 			else {
@@ -516,11 +540,11 @@ void PointTemplateInstance::OnKilledParent(bool cleared) {
 	}
 
 	this->mark_delete = !this->templ->keep_alive || cleared;
-	
+
 	if (this->mark_delete && on_kill_callback != nullptr) {
 		(*on_kill_callback)(this);
 	}
-	
+
 	this->parent = nullptr;
 	this->has_parent = false;
 }
@@ -598,7 +622,7 @@ void Update_Point_Templates()
 			}
 			inst->parent_helper->SetAbsOrigin(pos);
 			inst->parent_helper->SetAbsAngles(ang);
-			
+
 			//if (it->entities[1] != nullptr)
 			//	DevMsg("childpos %f %d %d\n",it->entities[1]->GetAbsOrigin().x, it->entities[1]->GetMoveParent() != nullptr, it->entities[1]->GetMoveParent() == it->parent_helper);
 		}
@@ -648,7 +672,7 @@ namespace Mod::Pop::PointTemplate
 		DETOUR_MEMBER_CALL();
 	}
 
-	
+
 	/* Pointtemplate keep child entities after parent removal*/
 	DETOUR_DECL_MEMBER(void, CBaseEntity_UpdateOnRemove)
 	{
@@ -659,12 +683,12 @@ namespace Mod::Pop::PointTemplate
 			CBaseEntity *child = entity->FirstMoveChild();
 
 			std::vector<CBaseEntity *> childrenToRemove;
-			
+
 			do {
 				if (child->GetEntityModule<TemplateEntityModule>("templatemodule") != nullptr) {
 					childrenToRemove.push_back(child);
 				}
-			} 
+			}
 			while ((child = child->NextMovePeer()) != nullptr);
 
 			for (auto childToRemove : childrenToRemove) {
@@ -672,7 +696,7 @@ namespace Mod::Pop::PointTemplate
 			}
 		}
 		auto templMod = entity->GetEntityModule<TemplateEntityModule>("templatemodule");
-		
+
 		if (templMod != nullptr)
 		{
 			if (templMod->deleteAllOnRemove) {
@@ -700,7 +724,7 @@ namespace Mod::Pop::PointTemplate
 		//DevMsg("Spawning template %s\n", src.c_str());
 		auto tmpl = FindPointTemplate(src);
 		if (tmpl != nullptr) {
-			
+
 			bool autoparent = maker->GetCustomVariableFloat<"autoparent">();
 			if (autoparent) {
 				vector = vec3_origin;
@@ -755,13 +779,13 @@ namespace Mod::Pop::PointTemplate
 					entity->SetAbsVelocity( vecShootDir );
 				}
 			}
-			
+
 			return true;
 		}
 		else
 			return false;
 	}
-	
+
 	DETOUR_DECL_MEMBER(void, CEnvEntityMaker_InputForceSpawn, inputdata_t &inputdata)
 	{
 		auto me = reinterpret_cast<CEnvEntityMaker *>(this);
@@ -783,7 +807,7 @@ namespace Mod::Pop::PointTemplate
 			DETOUR_MEMBER_CALL(vector,angles);
 		}
 	}
-	
+
 	DETOUR_DECL_MEMBER(void, CBaseEntity_SetParent, CBaseEntity *pParentEntity, int iAttachment)
 	{
 		auto me = reinterpret_cast<CBaseEntity *>(this);
@@ -858,7 +882,7 @@ namespace Mod::Pop::PointTemplate
 	{
 		CBaseEntity *me = reinterpret_cast<CBaseEntity *>(reinterpret_cast<CCollisionProperty *>(this)->GetEntityHandle());
 		if (me == nullptr) { DETOUR_MEMBER_CALL(flags); return; }
-		
+
 		if (!cvar_whole_map_trigger_all.GetBool() && WholeMapTriggerModule::List().empty()) { DETOUR_MEMBER_CALL(flags); return; }
 
 		SCOPED_INCREMENT(rc_CCollisionProperty_SetSolidFlags);
@@ -868,7 +892,7 @@ namespace Mod::Pop::PointTemplate
 		//Msg("entity %s %d %d %d\n", me->GetClassname(), me->CollisionProp()->IsSolidFlagSet(FSOLID_TRIGGER), me->CollisionProp()->IsSolidFlagSet(FSOLID_NOT_SOLID), TriggerCollideable(me));
 		auto solidnow = TriggerCollideable(me);
 		if (!solidpre && solidnow) {
-			int restore = -1; 
+			int restore = -1;
 			if (me->IsPlayer() && !me->IsAlive()) {
 				restore = me->m_lifeState;
 				me->m_lifeState = LIFE_ALIVE;
@@ -938,7 +962,7 @@ namespace Mod::Pop::PointTemplate
 			MOD_ADD_DETOUR_MEMBER(CUpgrades_Spawn, "CUpgrades::Spawn");
 			MOD_ADD_DETOUR_MEMBER(CUpgrades_D0, "CUpgrades::~CUpgrades [D0]");
 			MOD_ADD_DETOUR_MEMBER(CUpgrades_D2, "CUpgrades::~CUpgrades [D2]");
-			
+
 			MOD_ADD_DETOUR_MEMBER(CBaseEntity_UpdateOnRemove, "CBaseEntity::UpdateOnRemove");
 			MOD_ADD_DETOUR_MEMBER(CEnvEntityMaker_SpawnEntity,                   "CEnvEntityMaker::SpawnEntity");
 			MOD_ADD_DETOUR_MEMBER(CEnvEntityMaker_InputForceSpawn,               "CEnvEntityMaker::InputForceSpawn");
