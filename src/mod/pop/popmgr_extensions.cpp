@@ -123,7 +123,7 @@ namespace Mod::Pop::PopMgr_Extensions
 		"Fixup blu players sounds so they use human sounds unless set otherwise. Set to 0 if it conflicts with other plugins");
 
 	ConVar cvar_show_free_descriptions("sig_mvm_show_free_descriptions", "0", FCVAR_NOTIFY | FCVAR_GAMEDLL, 
-		"Allow free weapons to display their descriptions, rather than instantly equiping, can be toggled client-side with the `sig_free_menu_disable` and `sig_free_menu_enabled` commands");
+		"Allow free weapons to display their descriptions, rather than instantly equiping, can be toggled client-side with the command `!free_weapons_menu`");
 
 	void ResetVoteList() {
 		std::string poplistStr;
@@ -3506,14 +3506,37 @@ namespace Mod::Pop::PopMgr_Extensions
 	// if the player wants to instantly equip items in the menu
 	bool player_skip_free_menu[MAX_PLAYERS + 1] = {};
 
-	ModCommandClient sig_free_menu_disable("sig_free_menu_disable", [](CCommandPlayer *player, const CCommand& args){
-        player_skip_free_menu[ENTINDEX(player)] = 1;
-		ModCommandResponse("%s\n", TranslateText(player, "Free weapons will no longer show a menu"));
-    });
+    ModCommandClient sig_free_menu("sig_free_weapons_menu", [](CCommandPlayer *player, const CCommand& args){
+		if (cvar_show_free_descriptions.GetBool() == false)
+		{
+			return ModCommandResponse("%s %s\n", TranslateText(player, "Free weapons menu tag"), TranslateText(player, "This command can not be used"));
+		}
 
-    ModCommandClient sig_free_menu_enable("sig_free_menu_enable", [](CCommandPlayer *player, const CCommand& args){
-        player_skip_free_menu[ENTINDEX(player)] = 0;
-		ModCommandResponse("%s\n", TranslateText(player, "Free weapons will now show a equip menu"));
+		if (args.ArgC() >= 1)
+		{
+			int newVal;
+			if (StringToIntStrict(args[0], newVal) && newVal) {
+				player_skip_free_menu[ENTINDEX(player)] = 1;
+			}
+			else {
+				player_skip_free_menu[ENTINDEX(player)] = 0;
+			}
+		}
+		else {
+			if (player_skip_free_menu[ENTINDEX(player)] == 0) {
+				player_skip_free_menu[ENTINDEX(player)] = 1;
+			}
+			else {
+				player_skip_free_menu[ENTINDEX(player)] = 0;
+			}
+		}
+
+		if (player_skip_free_menu[ENTINDEX(player)] == 0) {
+			ModCommandResponse("%s %s\n", TranslateText(player, "Free weapons menu tag"), TranslateText(player, "Free weapons will now show a equip menu"));
+		}
+		else {
+			ModCommandResponse("%s %s\n", TranslateText(player, "Free weapons menu tag"), TranslateText(player, "Free weapons will no longer show a menu"));
+		}
     });
 
 	bool ShouldMenuWeaponBuyShow(CTFPlayer *player, int cost) {
