@@ -559,7 +559,7 @@ namespace Mod::Pop::PopMgr_Extensions
 			m_FixBotSpawningStalls            ("sig_pop_wavespawn_spawnbot_stall_fix"),
 			m_ExtraBotsReservedSlots          ("sig_pop_extra_bots_reserved_slots"),
 			m_FixupBluSounds                  ("sig_mvm_blu_players_sound_fixup"),
-			m_ShowFreeWeaponMenus             ("sig_mvm_show_free_descriptions")
+			m_ShowFreeWeaponMenus             ("sig_mvm_show_free_descriptions"),
 
 
 			m_CustomUpgradesFile              ("sig_mvm_custom_upgrades_file")
