@@ -3512,10 +3512,10 @@ namespace Mod::Pop::PopMgr_Extensions
 			return ModCommandResponse("%s %s\n", TranslateText(player, "Free weapons menu tag"), TranslateText(player, "This command can not be used"));
 		}
 
-		if (args.ArgC() >= 1)
+		if (args.ArgC() >= 2)
 		{
 			int newVal;
-			if (StringToIntStrict(args[0], newVal) && newVal) {
+			if (StringToIntStrict(args[2], newVal) && newVal) {
 				player_skip_free_menu[ENTINDEX(player)] = 1;
 			}
 			else {
