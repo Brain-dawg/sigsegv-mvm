@@ -559,6 +559,7 @@ namespace Mod::Pop::PopMgr_Extensions
 			m_FixBotSpawningStalls            ("sig_pop_wavespawn_spawnbot_stall_fix"),
 			m_ExtraBotsReservedSlots          ("sig_pop_extra_bots_reserved_slots"),
 			m_FixupBluSounds                  ("sig_mvm_blu_players_sound_fixup"),
+			m_ShowFreeWeaponMenus             ("sig_mvm_show_free_descriptions"),
 
 
 			m_CustomUpgradesFile              ("sig_mvm_custom_upgrades_file")
@@ -674,6 +675,7 @@ namespace Mod::Pop::PopMgr_Extensions
 			this->m_bNPCLagCompensation.Reset(pre);
 			this->m_FixBotSpawningStalls.Reset(pre);
 			this->m_FixupBluSounds.Reset(pre);
+			this->m_ShowFreeWeaponMenus.Reset(pre);
 
 			this->m_CustomUpgradesFile.Reset(pre);
 			this->m_TextPrintSpeed.Reset(pre);
@@ -998,6 +1000,7 @@ namespace Mod::Pop::PopMgr_Extensions
 		CValueOverridePopfile_ConVar<bool> m_FixBotSpawningStalls;
 		CValueOverridePopfile_ConVar<bool> m_ExtraBotsReservedSlots;
 		CValueOverridePopfile_ConVar<bool> m_FixupBluSounds;
+		CValueOverridePopfile_ConVar<bool> m_ShowFreeWeaponMenus;
 
 		//CValueOverride_CustomUpgradesFile m_CustomUpgradesFile;
 		CValueOverridePopfile_ConVar<std::string> m_CustomUpgradesFile;
@@ -7045,6 +7048,8 @@ namespace Mod::Pop::PopMgr_Extensions
 				state.m_FixBotSpawningStalls.Set(subkey->GetBool());
 			} else if (FStrEq(name, "ExtraBotSlotsReservedNormalSlotCount")) {
 				state.m_ExtraBotsReservedSlots.Set(subkey->GetBool());
+			} else if (FStrEq(name, "ShowMenusForFreeWeapons")) {
+				state.m_ShowFreeWeaponMenus.Set(subkey->GetBool());
 			} else if (FStrEq(name, "EnemyTeamForReverse")) {
 				if (FStrEq(subkey->GetString(), "Red")) {
 					state.m_iEnemyTeamForReverse = 2;
