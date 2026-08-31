@@ -3515,7 +3515,7 @@ namespace Mod::Pop::PopMgr_Extensions
 		if (args.ArgC() >= 2)
 		{
 			int newVal;
-			player_skip_free_menu[ENTINDEX(player)] = StringToIntStrict(args[2], newVal) && newVal
+			player_skip_free_menu[ENTINDEX(player)] = StringToIntStrict(args[2], newVal) && newVal;
 			// if (StringToIntStrict(args[2], newVal) && newVal) {
 			// 	player_skip_free_menu[ENTINDEX(player)] = 1;
 			// }
@@ -3524,7 +3524,7 @@ namespace Mod::Pop::PopMgr_Extensions
 			// }
 		}
 		else {
-			player_skip_free_menu[ENTINDEX(player)] = !player_skip_free_menu[ENTINDEX(player)]
+			player_skip_free_menu[ENTINDEX(player)] = !player_skip_free_menu[ENTINDEX(player)];
 			// if (player_skip_free_menu[ENTINDEX(player)] == 0) {
 			// 	player_skip_free_menu[ENTINDEX(player)] = 1;
 			// }
