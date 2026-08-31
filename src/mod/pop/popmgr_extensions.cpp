@@ -3515,23 +3515,26 @@ namespace Mod::Pop::PopMgr_Extensions
 		if (args.ArgC() >= 2)
 		{
 			int newVal;
-			if (StringToIntStrict(args[2], newVal) && newVal) {
-				player_skip_free_menu[ENTINDEX(player)] = 1;
-			}
-			else {
-				player_skip_free_menu[ENTINDEX(player)] = 0;
-			}
+			player_skip_free_menu[ENTINDEX(player)] = StringToIntStrict(args[2], newVal) && newVal
+			// if (StringToIntStrict(args[2], newVal) && newVal) {
+			// 	player_skip_free_menu[ENTINDEX(player)] = 1;
+			// }
+			// else {
+			// 	player_skip_free_menu[ENTINDEX(player)] = 0;
+			// }
 		}
 		else {
-			if (player_skip_free_menu[ENTINDEX(player)] == 0) {
-				player_skip_free_menu[ENTINDEX(player)] = 1;
-			}
-			else {
-				player_skip_free_menu[ENTINDEX(player)] = 0;
-			}
+			player_skip_free_menu[ENTINDEX(player)] = !player_skip_free_menu[ENTINDEX(player)]
+			// if (player_skip_free_menu[ENTINDEX(player)] == 0) {
+			// 	player_skip_free_menu[ENTINDEX(player)] = 1;
+			// }
+			// else {
+			// 	player_skip_free_menu[ENTINDEX(player)] = 0;
+			// }
 		}
 
-		if (player_skip_free_menu[ENTINDEX(player)] == 0) {
+		// if (player_skip_free_menu[ENTINDEX(player)] == 0) {
+		if (player_skip_free_menu[ENTINDEX(player)] == false) {
 			ModCommandResponse("%s %s\n", TranslateText(player, "Free weapons menu tag"), TranslateText(player, "Free weapons will now show a equip menu"));
 		}
 		else {
@@ -3546,7 +3549,7 @@ namespace Mod::Pop::PopMgr_Extensions
 		// cost will be 0 at this point
 
 		if (cvar_show_free_descriptions.GetBool()) {
-			return player_skip_free_menu[ENTINDEX(player)] == 0;
+			return player_skip_free_menu[ENTINDEX(player)] == false;
 			// value == 0, show menu, else dont
 		}
 		else {
