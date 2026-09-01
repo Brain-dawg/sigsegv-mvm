@@ -5831,13 +5831,13 @@ namespace Mod::Attr::Custom_Attributes
 		return result;
 	}
 
-	void BaseCheckReload(CTFWeaponBase* weapon) {
+	bool BaseCheckReload(CTFWeaponBase* weapon) {
 		if ( weapon->IsEnergyWeapon() )
 		{
 			if ( !weapon->Energy_HasEnergy() )
 			{
 				weapon->Reload();
-				return;
+				return true;
 			}
 
 			if (weapon->m_bInReload && (weapon->m_flNextPrimaryAttack <= gpGlobals->curtime))
@@ -5856,14 +5856,15 @@ namespace Mod::Attr::Custom_Attributes
 		}
 		else
 		{
+			return false;
 			CombatWepCheckReload(weapon);
 		}
 	}
 
 	void CombatWepCheckReload(CTFWeaponBase* weapon) {
-		if ( m_bReloadsSingly )
+		if ( weapon->m_bReloadsSingly )
 		{
-			CBaseEntity *pOwner = weapon->GetOwner();
+			CTFPlayer *pOwner = weapon->GetTFPlayerOwner();
 			if ( !pOwner )
 				return;
 
@@ -5876,7 +5877,7 @@ namespace Mod::Attr::Custom_Attributes
 					return;
 				}
 				// If clip not full reload again
-				else if (weapon->m_iClip1 < GetMaxClip1())
+				else if (weapon->m_iClip1 < weapon->GetMaxClip1())
 				{
 					// Add them to the clip
 					weapon->m_iClip1 += 1;
@@ -5913,7 +5914,10 @@ namespace Mod::Attr::Custom_Attributes
 		
 		auto weapon = reinterpret_cast<CTFWeaponBase *>(this);
 		if (weapon->GetMaxClip1() != -1 && GetFastAttributeInt(weapon, 0, PASSIVE_RELOAD) != 0) {
-			BaseCheckReload(weapon); // override
+			if(!BaseCheckReload(weapon)) // override
+			{
+				CombatWepCheckReload(weapon);
+			}
 			// weapon->CheckReload();
 		}
 	}
