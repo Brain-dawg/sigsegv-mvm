@@ -3512,28 +3512,18 @@ namespace Mod::Pop::PopMgr_Extensions
 			return ModCommandResponse("%s %s\n", TranslateText(player, "Free weapons menu tag"), TranslateText(player, "This command can not be used"));
 		}
 
-		if (args.ArgC() >= 2)
+		if (args.ArgC() > 1)
 		{
-			int newVal;
-			player_skip_free_menu[ENTINDEX(player)] = StringToIntStrict(args[2], newVal) && newVal;
-			// if (StringToIntStrict(args[2], newVal) && newVal) {
-			// 	player_skip_free_menu[ENTINDEX(player)] = 1;
-			// }
-			// else {
-			// 	player_skip_free_menu[ENTINDEX(player)] = 0;
-			// }
+			int newVal = 0;
+			player_skip_free_menu[ENTINDEX(player)] = StringToIntStrict(args[1], newVal) && newVal;
+			// Msg("newVal == %d, while StringToIntStrict returned %s\n", newVal, StringToIntStrict(args[1], newVal) ? "true" : "false" );
+			// Msg("Player (%d) is setting their player_skip_free_menu to %s\n", ENTINDEX(player), (StringToIntStrict(args[1], newVal) && newVal) ? "true" : "false");
 		}
-		else {
+		else { // toggle
 			player_skip_free_menu[ENTINDEX(player)] = !player_skip_free_menu[ENTINDEX(player)];
-			// if (player_skip_free_menu[ENTINDEX(player)] == 0) {
-			// 	player_skip_free_menu[ENTINDEX(player)] = 1;
-			// }
-			// else {
-			// 	player_skip_free_menu[ENTINDEX(player)] = 0;
-			// }
+			// Msg("Player (%d) is setting their player_skip_free_menu to %s\n", ENTINDEX(player), player_skip_free_menu[ENTINDEX(player)] ? "true" : "false");
 		}
 
-		// if (player_skip_free_menu[ENTINDEX(player)] == 0) {
 		if (player_skip_free_menu[ENTINDEX(player)] == false) {
 			ModCommandResponse("%s %s\n", TranslateText(player, "Free weapons menu tag"), TranslateText(player, "Free weapons will now show a equip menu"));
 		}
