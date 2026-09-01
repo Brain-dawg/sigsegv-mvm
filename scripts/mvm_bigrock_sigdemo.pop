@@ -45,7 +45,7 @@ WaveSchedule
 	CustomUpgradesFile "mvm_upgrades_sigsegv_extra_v19.txt" [$SIGSEGV] //Custom upgrades file. File must be named mvm_upgrades_x.txt, then send to the server
 	// ExtendedUpgradesOnly 1 [$SIGSEGV] // Do not display regular upgrade menu, only show extended upgrades (default: 0)
 	AllowUpgradesForUnintendedClassWeapons 1 [$SIGSEGV] // Allow upgrading weapons given to unintended class (default: 1)
-	ShowMenusForFreeWeapons 1 [$SIGSEGV] // Allow free weapons to display their descriptions and stats, rather than instantly equiping (default: 0)
+	ShowMenusForFreeWeapons 1 [$SIGSEGV] // Allow free weapons to display their descriptions and stats, rather than instantly equiping, and can be toggled client-side with the `sig_free_menu_disable` and `sig_free_menu_enabled` commands (default: 0)
 
 
 	//////////////////////////

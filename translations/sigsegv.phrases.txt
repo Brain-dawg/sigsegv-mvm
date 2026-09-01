@@ -1912,4 +1912,24 @@
         "ua" "Бомби-липучки"
         "zho" "黏性炸彈"
 	}
+
+	"Free weapons menu tag"
+	{
+		"en" "[sig_free_weapons_menu]"
+	}
+
+	"Free weapons will no longer show a menu"
+	{
+		"en" "Free weapons will no longer show an equip menu."
+	}
+	
+	"Free weapons will now show a equip menu"
+	{
+		"en" "Free weapons will now show an equip menu when selected."
+	}
+
+	"This command can not be used"
+	{
+		"en" "This command cannot be used at this time."
+	}
 }
