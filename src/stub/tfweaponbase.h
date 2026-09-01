@@ -47,6 +47,9 @@ public:
 	void ApplyOnHitAttributes(CBaseEntity *pVictimBaseEntity, CTFPlayer *pAttacker, const CTakeDamageInfo &info) { return vt_ApplyOnHitAttributes(this, pVictimBaseEntity, pAttacker, info); }
 	int GetSkin()                            { return vt_GetSkin(this); }
 	void WeaponReset()                       {        vt_WeaponReset(this); }
+
+	bool Energy_HasEnergy()                  { return m_flEnergy >= Energy_GetShotCost(); }
+	bool Energy_FullyCharged()               { return m_flEnergy >= Energy_GetMaxEnergy(); }
 	
 
 	DECL_SENDPROP(float,                m_flLastFireTime);
