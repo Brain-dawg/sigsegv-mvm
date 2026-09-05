@@ -1952,7 +1952,7 @@ namespace Mod::Etc::Mapentity_Additions
                     ent->FireCustomOutput<"outvalue">(pActivator, ent, Value);
                 }
         }},
-        {"DistanceToEntity"sv, false, [](CBaseEntity *ent, const char *szInputName, CBaseEntity *pActivator, CBaseEntity *pCaller, variant_t &Value){
+        {"Rotate"sv, false, [](CBaseEntity *ent, const char *szInputName, CBaseEntity *pActivator, CBaseEntity *pCaller, variant_t &Value){
             auto mathVector = ent->GetOrCreateEntityModule<MathVectorModule>("math_vector");
             auto vecValue = ent->GetCustomVariableVector<"value">();
                 Value.Convert(FIELD_VECTOR);
@@ -1963,13 +1963,13 @@ namespace Mod::Etc::Mapentity_Additions
                 Value.SetVector3D(out);
                 ent->FireCustomOutput<"outvalue">(pActivator, ent, Value);
         }},
-        {"DistanceToEntity"sv, false, [](CBaseEntity *ent, const char *szInputName, CBaseEntity *pActivator, CBaseEntity *pCaller, variant_t &Value){
+        {"Length"sv, false, [](CBaseEntity *ent, const char *szInputName, CBaseEntity *pActivator, CBaseEntity *pCaller, variant_t &Value){
             auto mathVector = ent->GetOrCreateEntityModule<MathVectorModule>("math_vector");
             auto vecValue = ent->GetCustomVariableVector<"value">();
                 Value.SetFloat(vecValue.Length());
                 ent->FireCustomOutput<"outvalue">(pActivator, ent, Value);
         }},
-        {"DistanceToEntity"sv, false, [](CBaseEntity *ent, const char *szInputName, CBaseEntity *pActivator, CBaseEntity *pCaller, variant_t &Value){
+        {"ToQAngle"sv, false, [](CBaseEntity *ent, const char *szInputName, CBaseEntity *pActivator, CBaseEntity *pCaller, variant_t &Value){
             auto mathVector = ent->GetOrCreateEntityModule<MathVectorModule>("math_vector");
             auto vecValue = ent->GetCustomVariableVector<"value">();
                 QAngle out;
