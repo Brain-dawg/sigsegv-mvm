@@ -5837,7 +5837,6 @@ namespace Mod::Attr::Custom_Attributes
 		
 		auto weapon = reinterpret_cast<CTFWeaponBase *>(this);
 		if (weapon->GetMaxClip1() != -1 && GetFastAttributeInt(weapon, 0, PASSIVE_RELOAD) != 0) {
-
 			CTFPlayer *pOwner = weapon->GetTFPlayerOwner();
 			if ( !pOwner )
 				return;
@@ -5846,6 +5845,7 @@ namespace Mod::Attr::Custom_Attributes
 			pOwner->m_nButtons = 0;
 			weapon->CheckReload();
 
+			pOwner->m_flNextAttack = 0.0;
 			pOwner->m_nButtons = stored_buttons;
 		}
 	}
@@ -7073,7 +7073,7 @@ namespace Mod::Attr::Custom_Attributes
 	{
 		auto weapon = reinterpret_cast<CTFWeaponBase *>(this);
 
-		if (rc_CTFWeaponBase_Reload && GetFastAttributeInt(weapon, 0, PASSIVE_RELOAD) && weapon->GetTFPlayerOwner() != nullptr && weapon->GetTFPlayerOwner()->GetActiveTFWeapon() != weapon) {
+		if (GetFastAttributeInt(weapon, 0, PASSIVE_RELOAD) && weapon->GetTFPlayerOwner() != nullptr && weapon->GetTFPlayerOwner()->GetActiveTFWeapon() != weapon) {
 			return false;
 		}
 		
