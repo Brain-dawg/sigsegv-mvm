@@ -7083,7 +7083,7 @@ namespace Mod::Attr::Custom_Attributes
 	{
 		auto weapon = reinterpret_cast<CTFWeaponBase *>(this);
 
-		if (GetFastAttributeInt(weapon, 0, PASSIVE_RELOAD) && weapon->GetTFPlayerOwner() != nullptr && weapon->GetTFPlayerOwner()->GetActiveTFWeapon() != weapon) {
+		if (rc_CTFWeaponBase_Reload && GetFastAttributeInt(weapon, 0, PASSIVE_RELOAD) && weapon->GetTFPlayerOwner() != nullptr && weapon->GetTFPlayerOwner()->GetActiveTFWeapon() != weapon) {
 			return false;
 		}
 		
