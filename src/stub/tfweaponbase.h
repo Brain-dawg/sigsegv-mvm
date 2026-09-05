@@ -47,8 +47,6 @@ public:
 	void ApplyOnHitAttributes(CBaseEntity *pVictimBaseEntity, CTFPlayer *pAttacker, const CTakeDamageInfo &info) { return vt_ApplyOnHitAttributes(this, pVictimBaseEntity, pAttacker, info); }
 	int GetSkin()                            { return vt_GetSkin(this); }
 	void WeaponReset()                       {        vt_WeaponReset(this); }
-	void Reload()                            {        vt_Reload(this); }
-	void FinishReload()                      {        vt_FinishReload(this); }
 
 	bool Energy_HasEnergy()                  { return m_flEnergy >= Energy_GetShotCost(); }
 	bool Energy_FullyCharged()               { return m_flEnergy >= Energy_GetMaxEnergy(); }
@@ -95,8 +93,6 @@ private:
 	static MemberVFuncThunk<CTFWeaponBase *, void, CBaseEntity *, CTFPlayer *, const CTakeDamageInfo &> vt_ApplyOnHitAttributes;
 	static MemberVFuncThunk<CTFWeaponBase *, int> vt_GetSkin;
 	static MemberVFuncThunk<CTFWeaponBase *, void> vt_WeaponReset;
-	static MemberVFuncThunk<CTFWeaponBase *, void> vt_Reload;
-	static MemberVFuncThunk<CTFWeaponBase *, void> vt_FinishReload;
 };
 
 class CTFWeaponBaseGun : public CTFWeaponBase {

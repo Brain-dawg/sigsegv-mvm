@@ -5831,94 +5831,22 @@ namespace Mod::Attr::Custom_Attributes
 		return result;
 	}
 
-	bool BaseCheckReload(CTFWeaponBase* weapon) {
-		if ( weapon->IsEnergyWeapon() )
-		{
-			if ( !weapon->Energy_HasEnergy() )
-			{
-				weapon->Reload();
-				return true;
-			}
-
-			if (weapon->m_bInReload && (weapon->m_flNextPrimaryAttack <= gpGlobals->curtime))
-			{
-				if ( !weapon->Energy_FullyCharged() )
-				{
-					weapon->Reload();
-				}
-				else
-				{
-					weapon->FinishReload();
-					weapon->m_flNextPrimaryAttack	= gpGlobals->curtime;
-					weapon->m_flNextSecondaryAttack = gpGlobals->curtime;
-				}
-			}
-		}
-		else
-		{
-			return false;
-			CombatWepCheckReload(weapon);
-		}
-	}
-
-	void CombatWepCheckReload(CTFWeaponBase* weapon) {
-		if ( weapon->m_bReloadsSingly )
-		{
-			CTFPlayer *pOwner = weapon->GetTFPlayerOwner();
-			if ( !pOwner )
-				return;
-
-			if (weapon->m_bInReload && (weapon->m_flNextPrimaryAttack <= gpGlobals->curtime))
-			{
-				// If out of ammo end reload
-				if (pOwner->GetAmmoCount(weapon->m_iPrimaryAmmoType) <= 0)
-				{
-					weapon->FinishReload();
-					return;
-				}
-				// If clip not full reload again
-				else if (weapon->m_iClip1 < weapon->GetMaxClip1())
-				{
-					// Add them to the clip
-					weapon->m_iClip1 += 1;
-					pOwner->RemoveAmmo( 1, weapon->m_iPrimaryAmmoType );
-
-					weapon->Reload();
-					return;
-				}
-				// Clip full, stop reloading
-				else
-				{
-					weapon->FinishReload();
-					weapon->m_flNextPrimaryAttack	= gpGlobals->curtime;
-					weapon->m_flNextSecondaryAttack = gpGlobals->curtime;
-					return;
-				}
-			}
-		}
-		else
-		{
-			if ( weapon->m_bInReload && (weapon->m_flNextPrimaryAttack <= gpGlobals->curtime))
-			{
-				weapon->FinishReload();
-				weapon->m_flNextPrimaryAttack	= gpGlobals->curtime;
-				weapon->m_flNextSecondaryAttack = gpGlobals->curtime;
-				weapon->m_bInReload = false;
-			}
-		}
-	}
-
 	DETOUR_DECL_MEMBER(void, CTFWeaponBase_ItemHolsterFrame)
 	{
 		DETOUR_MEMBER_CALL();
 		
 		auto weapon = reinterpret_cast<CTFWeaponBase *>(this);
 		if (weapon->GetMaxClip1() != -1 && GetFastAttributeInt(weapon, 0, PASSIVE_RELOAD) != 0) {
-			if(!BaseCheckReload(weapon)) // override
-			{
-				CombatWepCheckReload(weapon);
-			}
-			// weapon->CheckReload();
+
+			CTFPlayer *pOwner = weapon->GetTFPlayerOwner();
+			if ( !pOwner )
+				return;
+
+			int stored_buttons = pOwner->m_nButtons;
+			pOwner->m_nButtons = 0;
+			weapon->CheckReload();
+
+			pOwner->m_nButtons = stored_buttons;
 		}
 	}
 	
