@@ -5841,10 +5841,20 @@ namespace Mod::Attr::Custom_Attributes
 			if ( !pOwner )
 				return;
 
+			// We need to do this to prevent attacking from canceling our reload
+			// and to fix animation speed on out viewmodel looking wierd
 			int stored_buttons = pOwner->m_nButtons;
 			pOwner->m_nButtons = 0;
+
+			float prev_playbackrate = 1.0;
+			CBaseViewModel *viewmodel = pOwner->GetViewModel();
+			if ( viewmodel )
+				prev_playbackrate = viewmodel->m_flPlaybackRate;
+
 			weapon->CheckReload();
 
+			if ( viewmodel )
+				viewmodel->m_flPlaybackRate = prev_playbackrate;
 			pOwner->m_flNextAttack = 0.0;
 			pOwner->m_nButtons = stored_buttons;
 		}
