@@ -102,6 +102,8 @@ MemberVFuncThunk<CTFWeaponBase *, float> CTFWeaponBase::vt_GetEffectBarProgress(
 MemberVFuncThunk<CTFWeaponBase *, void, CBaseEntity *, CTFPlayer *, const CTakeDamageInfo &> CTFWeaponBase::vt_ApplyOnHitAttributes(TypeName<CTFWeaponBase>(),  "CTFWeaponBase::ApplyOnHitAttributes");
 MemberVFuncThunk<CTFWeaponBase *, int> CTFWeaponBase::vt_GetSkin(TypeName<CTFWeaponBase>(),  "CTFWeaponBase::GetSkin");
 MemberVFuncThunk<CTFWeaponBase *, void> CTFWeaponBase::vt_WeaponReset(TypeName<CTFWeaponBase>(),  "CTFWeaponBase::WeaponReset");
+MemberVFuncThunk<CTFWeaponBase *, void> CTFWeaponBase::vt_Reload(TypeName<CTFWeaponBase>(),  "CTFWeaponBase::Reload");
+MemberVFuncThunk<CTFWeaponBase *, void> CTFWeaponBase::vt_FinishReload(TypeName<CTFWeaponBase>(),  "CTFWeaponBase::FinishReload");
 
 
 MemberFuncThunk<CTFWeaponBaseGun *, void, CTFPlayer *> CTFWeaponBaseGun::ft_UpdatePunchAngles("CTFWeaponBaseGun::UpdatePunchAngles");

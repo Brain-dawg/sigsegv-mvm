@@ -5831,32 +5831,76 @@ namespace Mod::Attr::Custom_Attributes
 		return result;
 	}
 
+	void HorribleFixForPassiveReloadShit(CTFWeaponBase *weapon, bool in_reload, bool can_attack) {
+		CTFPlayer *pOwner = weapon->GetTFPlayerOwner();
+		if ( !pOwner )
+			return;
+
+		if ( weapon->IsEnergyWeapon() ) {
+			if ( in_reload && can_attack ) {
+				if ( !weapon->Energy_FullyCharged() ) {
+					weapon->Reload();
+				}
+				else {
+					weapon->m_flNextPrimaryAttack	= gpGlobals->curtime;
+					weapon->m_flNextSecondaryAttack = gpGlobals->curtime;
+				}
+			}
+		}
+		else if ( weapon->m_bReloadsSingly ) {
+			if ( in_reload && can_attack ) {
+				// If out of ammo end reload
+				if ( pOwner->GetAmmoCount( weapon->m_iPrimaryAmmoType ) <= 0 ) {
+					return;
+				}
+				// If clip not full reload again
+				else if ( weapon->m_iClip1 < weapon->GetMaxClip1() ) {
+					// Add them to the clip
+					weapon->m_iClip1 += 1;
+					pOwner->RemoveAmmo( 1, weapon->m_iPrimaryAmmoType );
+
+					weapon->Reload();
+					return;
+				}
+				// Clip full, stop reloading
+				else {
+					weapon->m_flNextPrimaryAttack	= gpGlobals->curtime;
+					weapon->m_flNextSecondaryAttack = gpGlobals->curtime;
+					return;
+				}
+			}
+		}
+		else if ( in_reload && can_attack ) {
+			weapon->FinishReload();
+			weapon->m_flNextPrimaryAttack	= gpGlobals->curtime;
+			weapon->m_flNextSecondaryAttack = gpGlobals->curtime;
+			weapon->m_bInReload = false;
+		}
+	}
+
 	DETOUR_DECL_MEMBER(void, CTFWeaponBase_ItemHolsterFrame)
 	{
 		DETOUR_MEMBER_CALL();
 		
 		auto weapon = reinterpret_cast<CTFWeaponBase *>(this);
-		if (weapon->GetMaxClip1() != -1 && GetFastAttributeInt(weapon, 0, PASSIVE_RELOAD) != 0) {
+		if ((weapon->GetMaxClip1() != -1 && weapon->Clip1() < weapon->GetMaxClip1()) && GetFastAttributeInt(weapon, 0, PASSIVE_RELOAD) != 0) {
+			// We need to do this to prevent attacking from canceling our reload
+			// and to fix animation speed on out viewmodel looking wierd
 			CTFPlayer *pOwner = weapon->GetTFPlayerOwner();
 			if ( !pOwner )
 				return;
 
-			// We need to do this to prevent attacking from canceling our reload
-			// and to fix animation speed on out viewmodel looking wierd
-			int stored_buttons = pOwner->m_nButtons;
-			pOwner->m_nButtons = 0;
-
 			float prev_playbackrate = 1.0;
+			float last_attack = pOwner->m_flNextAttack;
 			CBaseViewModel *viewmodel = pOwner->GetViewModel();
 			if ( viewmodel )
 				prev_playbackrate = viewmodel->m_flPlaybackRate;
 
-			weapon->CheckReload();
+			HorribleFixForPassiveReloadShit(weapon, weapon->m_bInReload, weapon->m_flNextPrimaryAttack <= gpGlobals->curtime);
 
 			if ( viewmodel )
 				viewmodel->m_flPlaybackRate = prev_playbackrate;
-			pOwner->m_flNextAttack = 0.0;
-			pOwner->m_nButtons = stored_buttons;
+			pOwner->m_flNextAttack = last_attack;
 		}
 	}
 	
